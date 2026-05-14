@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ЕГЭ КСЕНОН | пошаговый неон-экзамен</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* НЕОНОВЫЙ ФОН + ЛЕТАЮЩИЕ НОТКИ */
+        body {
+            background: radial-gradient(circle at 20% 10%, #01071a, #000000);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Poppins', 'Montserrat', monospace;
+            padding: 1.5rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ЛЕТАЮЩИЕ НОТКИ 🎵 */
+        .floating-note {
+            position: fixed;
+            font-size: 1.8rem;
+            pointer-events: none;
+            z-index: 0;
+            filter: drop-shadow(0 0 6px cyan);
+            animation: flyNotes linear infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes flyNotes {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            15% { opacity: 0.7; }
+            85% { opacity: 0.7; }
+            100% {
+                transform: translateY(-20vh) rotate(12deg);
+                opacity: 0;
+            }
+        }
+
+        /* ГЛАВНАЯ НЕОН-КАРТА */
+        .neon-container {
+            position: relative;
+            z-index: 20;
+            width: 100%;
+            max-width: 750px;
+            background: rgba(0, 15, 25, 0.7);
+            backdrop-filter: blur(14px);
+            border-radius: 56px;
+            border: 2px solid #0ff;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4), inset 0 0 12px rgba(0, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        /* ШАПКА */
+        .neon-header {
+            padding: 1.3rem 1.5rem;
+            text-align: center;
+            border-bottom: 2px solid #0ff;
+            background: rgba(0, 40, 50, 0.5);
+        }
+
+        .neon-header h1 {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #bbffff, #0ff, #f05eff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px cyan;
+        }
+
+        .neon-header p {
+            color: #aaf5ff;
+            text-shadow: 0 0 3px cyan;
+            font-size: 0.8rem;
+        }
+
+        /* ВКЛАДКИ (СТЕППЕР) */
+        .step-bar {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0, 20, 30, 0.85);
+            padding: 0.7rem 1.5rem;
+            border-bottom: 1px solid cyan;
+        }
+
+        .step-tab {
+            flex: 1;
+            text-align: center;
+            padding: 0.6rem 0;
+            margin: 0 0.3rem;
+            font-weight: bold;
+            border-radius: 60px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #7fd4e0;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            border: 1px solid #0ff66a;
+            cursor: pointer;
+        }
+
+        .step-tab.active {
+            background: linear-gradient(120deg, #0ff, #0a6eff);
+            color: #01000c;
+            text-shadow: 0 0 2px white;
+            box-shadow: 0 0 14px cyan;
+            font-weight: 800;
+            border-color: white;
+        }
+
+        .step-tab.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: #4a6e7a;
+            filter: grayscale(0.1);
+        }
+
+        .step-tab.completed {
+            border-color: #0ff;
+            background: rgba(0, 255, 200, 0.25);
+            color: #c3ffff;
+        }
+
+        /* ОСНОВНАЯ ЗОНА ВОПРОСА */
+        .question-area {
+            padding: 2rem 2rem 1.8rem;
+            min-height: 380px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .question-card {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            padding: 1.4rem;
+            border-left: 8px solid #0ff;
+            margin-bottom: 1.8rem;
+        }
+
+        .question-title {
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: #f0fcff;
+            text-shadow: 0 0 4px cyan;
+            margin-bottom: 0.6rem;
+        }
+
+        .badge-step {
+            background: #0ff;
+            display: inline-block;
+            padding: 0.2rem 1rem;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #010018;
+            margin-right: 0.8rem;
+        }
+
+        /* НЕОН-ОПЦИИ */
+        .neon-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .neon-opt {
+            background: rgba(0, 30, 45, 0.7);
+            border-radius: 60px;
+            padding: 0.7rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            border: 1px solid #0ff;
+            transition: 0.2s;
+        }
+
+        .neon-opt:hover {
+            background: rgba(0, 255, 255, 0.2);
+            transform: scale(0.98);
+            border-color: magenta;
+            box-shadow: 0 0 12px magenta;
+        }
+
+        .neon-opt input {
+            accent-color: #0ff;
+            width: 1.2rem;
+            height: 1.2rem;
+            cursor: pointer;
+        }
+
+        .neon-opt label {
+            flex: 1;
+            font-weight: 500;
+            color: #e0f5ff;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        /* КНОПКИ НАВИГАЦИИ */
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+        }
+
+        .neon-btn {
+            background: rgba(0, 20, 30, 0.9);
+            border: 1.5px solid #0ff;
+            padding: 0.7rem 1.8rem;
+            font-weight: bold;
+            border-radius: 60px;
+            color: #0ff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .neon-btn.primary {
+            background: #0ff;
+            color: #01001a;
+            box-shadow: 0 0 12px cyan;
+            font-weight: 800;
+        }
+
+        .neon-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* РЕЗУЛЬТАТ */
+        .result-screen {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            margin: 1rem;
+            border-radius: 2rem;
+            border: 2px solid cyan;
+        }
+
+        .win-text {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #b9ffdd;
+            text-shadow: 0 0 10px #0ff;
+        }
+
+        .fail-text {
+            font-size: 1.8rem;
+            color: #ffb3c6;
+            text-shadow: 0 0 8px #ff3b6f;
+        }
+
+        .restart-neon-btn {
+            background: cyan;
+            border: none;
+            padding: 0.7rem 2rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 60px;
+            margin-top: 1.2rem;
+            cursor: pointer;
+        }
+
+        footer {
+            font-size: 0.65rem;
+            text-align: center;
+            padding: 0.8rem;
+            color: #6effe0;
+            background: rgba(0, 0, 0, 0.4);
+            border-top: 1px solid cyan;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="neon-container" id="appNeon">
+    <div class="neon-header">
+        <h1>⚡ ЕГЭ: КСЕНОН 1 ⚡</h1>
+        <p>🎧 пошаговый неон-экзамен | ответь на каждой вкладке</p>
+    </div>
+    <div id="stepIndicator" class="step-bar"></div>
+    <div id="dynamicContent"></div>
+    <footer>🎵 правильный путь — вкладка за вкладкой | летающие нотки поддержат</footer>
+</div>
+
+<script>
+    // ---------- ЭТАЛОННЫЕ ОТВЕТЫ (НИГДЕ НЕ ПОКАЗЫВАЕМ) ----------
+    const RIGHT_ANSWERS = {
+        q1: "26",      // сколько лет ксенону -> 26
+        q2: "влад",    // как зовут -> влад
+        q3: "джанна"   // с кем поссорился -> джанна
+    };
+
+    // Вопросы (без подсказок в интерфейсе, только чистый текст)
+    const STEPS = [
+        {
+            id: "q1",
+            title: "ВОПРОС 1",
+            text: "Сколько ксенону лет?",
+            options: [
+                { value: "23", label: "1) 23" },
+                { value: "26", label: "2) 26" },
+                { value: "27", label: "3) 27" }
+            ]
+        },
+        {
+            id: "q2",
+            title: "ВОПРОС 2",
+            text: "Как зовут ксенона?",
+            options: [
+                { value: "ксеновонтов", label: "1) Ксеновонтов" },
+                { value: "максим", label: "2) Максим" },
+                { value: "влад", label: "3) Влад" }
+            ]
+        },
+        {
+            id: "q3",
+            title: "ВОПРОС 3",
+            text: "С кем он поссорился?",
+            options: [
+                { value: "джанна", label: "1) Джанна" },
+                { value: "дима баннов", label: "2) Дима Баннов" },
+                { value: "six seven", label: "3) Six Seven" }
+            ]
+        }
+    ];
+
+    // СОСТОЯНИЕ
+    let currentStepIndex = 0;          // 0,1,2
+    let userAnswers = {
+        q1: "",
+        q2: "",
+        q3: ""
+    };
+    let examStatus = "testing";        // 'testing', 'passed', 'failed'
+
+    // DOM-элементы
+    const stepIndicatorDiv = document.getElementById("stepIndicator");
+    const dynamicDiv = document.getElementById("dynamicContent");
+
+    // ---- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----
+    function isStepCompleted(stepId) {
+        return userAnswers[stepId] !== "";
+    }
+
+    // проверка можно ли перейти на шаг (все предыдущие должны быть отвечены)
+    function isStepAccessible(stepIdx) {
+        if (examStatus !== "testing") return false;
+        if (stepIdx === 0) return true;
+        // чтобы открыть第二步, нужно ответить на первом
+        if (stepIdx === 1) return isStepCompleted(STEPS[0].id);
+        if (stepIdx === 2) return isStepCompleted(STEPS[0].id) && isStepCompleted(STEPS[1].id);
+        return false;
+    }
+
+    // переход на шаг (если доступен)
+    function goToStep(stepIdx) {
+        if (examStatus !== "testing") return;
+        if (!isStepAccessible(stepIdx)) return;
+        currentStepIndex = stepIdx;
+        renderCurrentStep();
+        renderStepTabs();
+    }
+
+    // выбор ответа
+    function selectAnswer(questionId, value) {
+        if (examStatus !== "testing") return;
+        userAnswers[questionId] = value;
+        // после выбора ответа перерисовываем текущий шаг и обновляем табы
+        renderCurrentStep();
+        renderStepTabs();
+    }
+
+    // следующий шаг
+    function nextStep() {
+        if (examStatus !== "testing") return;
+        const currentQ = STEPS[currentStepIndex];
+        if (!userAnswers[currentQ.id]) {
+            alert("🎤 Ответь на текущий вопрос, чтобы продолжить!");
+            return;
+        }
+        if (currentStepIndex + 1 < STEPS.length) {
+            // переходим на следующий шаг, если он доступен (а доступен, т.к. на этом уже ответили)
+            if (isStepAccessible(currentStepIndex + 1)) {
+                currentStepIndex++;
+                renderCurrentStep();
+                renderStepTabs();
+            } else {
+                // такого не должно быть, но на всякий
+                alert("Сначала ответь на предыдущие вопросы");
+            }
+        } else {
+            // последний шаг -> завершить экзамен
+            finishExam();
+        }
+    }
+
+    // предыдущий шаг
+    function prevStep() {
+        if (examStatus !== "testing") return;
+        if (currentStepIndex - 1 >= 0 && isStepAccessible(currentStepIndex - 1)) {
+            currentStepIndex--;
+            renderCurrentStep();
+            renderStepTabs();
+        }
+    }
+
+    // финальная проверка (сдать экзамен)
+    function finishExam() {
+        if (examStatus !== "testing") return;
+        // проверяем, что все вопросы отвечены
+        const allAnswered = (userAnswers.q1 !== "" && userAnswers.q2 !== "" && userAnswers.q3 !== "");
+        if (!allAnswered) {
+            alert("Ты пропустил вопрос! Заполни все вкладки.");
+            return;
+        }
+
+        const isWin = (userAnswers.q1 === RIGHT_ANSWERS.q1 &&
+                       userAnswers.q2 === RIGHT_ANSWERS.q2 &&
+                       userAnswers.q3 === RIGHT_ANSWERS.q3);
+        if (isWin) {
+            examStatus = "passed";
+            renderResultScreen(true);
+        } else {
+            examStatus = "failed";
+            renderResultScreen(false);
+        }
+    }
+
+    // ПОЛНЫЙ РЕСТАРТ
+    function restartExam() {
+        examStatus = "testing";
+        userAnswers = { q1: "", q2: "", q3: "" };
+        currentStepIndex = 0;
+        renderStepTabs();
+        renderCurrentStep();
+    }
+
+    // ОТРИСОВКА ВКЛАДОК (степпер)
+    function renderStepTabs() {
+        if (!stepIndicatorDiv) return;
+        let html = "";
+        STEPS.forEach((step, idx) => {
+            let stepClass = "step-tab";
+            const isAnswered = isStepCompleted(step.id);
+            const accessible = isStepAccessible(idx);
+            const active = (idx === currentStepIndex && examStatus === "testing");
+
+            if (active) stepClass += " active";
+            if (isAnswered && examStatus === "testing") stepClass += " completed";
+            if (!accessible && examStatus === "testing") stepClass += " locked";
+
+            html += `<div class="${stepClass}" data-stepidx="${idx}">${step.title}</div>`;
+        });
+        stepIndicatorDiv.innerHTML = html;
+
+        // вешаем обработчики только на доступные табы
+        if (examStatus === "testing") {
+            const tabs = document.querySelectorAll('.step-tab');
+            tabs.forEach(tab => {
+                const idx = parseInt(tab.getAttribute('data-stepidx'));
+                tab.addEventListener('click', (e) => {
+                    if (isStepAccessible(idx)) {
+                        goToStep(idx);
+                    }
+                });
+            });
+        }
+    }
+
+    // отрисовка текущего активного вопроса
+    function renderCurrentStep() {
+        if (!dynamicDiv) return;
+        if (examStatus !== "testing") return; // режим результата обрабатывается отдельно
+
+        const step = STEPS[currentStepIndex];
+        const currentAnswer = userAnswers[step.id] || "";
+
+        let optionsHtml = "";
+        step.options.forEach(opt => {
+            const checkedAttr = (currentAnswer === opt.value) ? "checked" : "";
+            optionsHtml += `
+                <div class="neon-opt" data-qid="${step.id}" data-val="${opt.value}">
+                    <input type="radio" name="stepRadio" id="opt_${opt.value}" value="${opt.value}" ${checkedAttr}>
+                    <label for="opt_${opt.value}">${opt.label}</label>
+                </div>
+            `;
+        });
+
+        const isLastStep = (currentStepIndex === STEPS.length - 1);
+        const nextBtnText = isLastStep ? "🔥 СДАТЬ ЕГЭ 🔥" : "ДАЛЕЕ ▶";
+
+        const html = `
+            <div class="question-area">
+                <div class="question-card">
+                    <div class="question-title">
+                        <span class="badge-step">${step.title}</span> ${step.text}
+                    </div>
+                    <div class="neon-options" id="optionsContainer">
+                        ${optionsHtml}
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button class="neon-btn" id="prevStepBtn" ${currentStepIndex === 0 ? 'disabled' : ''}>◀ НАЗАД</button>
+                    <button class="neon-btn primary" id="nextStepBtn">${nextBtnText}</button>
+                </div>
+            </div>
+        `;
+
+        dynamicDiv.innerHTML = html;
+
+        // навешиваем обработчики на радио и option-дивы
+        const optDivs = document.querySelectorAll('.neon-opt');
+        optDivs.forEach(div => {
+            const radio = div.querySelector('input[type="radio"]');
+            const qid = div.getAttribute('data-qid');
+            const val = div.getAttribute('data-val');
+            if (!radio || !qid || !val) return;
+
+            // удаляем старые, чтобы избежать дублей
+            const newRadio = radio.cloneNode(true);
+            radio.parentNode.replaceChild(newRadio, radio);
+            const updatedDiv = newRadio.closest('.neon-opt');
+            const finalRadio = updatedDiv.querySelector('input');
+
+            finalRadio.addEventListener('change', () => {
+                if (examStatus === "testing") {
+                    selectAnswer(qid, val);
+                }
+            });
+
+            updatedDiv.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'INPUT') {
+                    const innerRadio = updatedDiv.querySelector('input');
+                    if (innerRadio && !innerRadio.checked) {
+                        innerRadio.checked = true;
+                        const changeEv = new Event('change', { bubbles: true });
+                        innerRadio.dispatchEvent(changeEv);
+                    }
+                }
+            });
+        });
+
+        const prevBtn = document.getElementById("prevStepBtn");
+        const nextBtn = document.getElementById("nextStepBtn");
+        if (prevBtn) prevBtn.addEventListener("click", prevStep);
+        if (nextBtn) nextBtn.addEventListener("click", nextStep);
+    }
+
+    // ЭКРАН РЕЗУЛЬТАТА (успех/провал)
+    function renderResultScreen(isWin) {
+        if (!dynamicDiv) return;
+        if (isWin) {
+            dynamicDiv.innerHTML = `
+                <div class="result-screen">
+                    <div class="win-text">✨✨✨ ТЫ ОТВЕТИЛ ПРАВИЛЬНО НА ВСЕ ВОПРОСЫ ✨✨✨</div>
+                    <div style="margin:1rem; font-size:1.2rem;">🏆 Ксенон принимает экзамен 🏆</div>
+                    <button class="restart-neon-btn" id="restartWinBtn">🌀 ПРОЙТИ ЗАНОВО 🌀</button>
+                </div>
+            `;
+        } else {
+            dynamicDiv.innerHTML = `
+                <div class="result-screen">
+                    <div class="fail-text">❌ ТЫ НЕ ПРОШЁЛ ЭКЗАМЕН ❌</div>
+                    <div style="margin:0.8rem 0;">Ксенон не засчитал ответы. Начни заново.</div>
+                    <button class="restart-neon-btn" id="restartFailBtn">🔄 НАЧАТЬ ЗАНОВО 🔄</button>
+                </div>
+            `;
+        }
+        const restartBtn = document.getElementById(isWin ? "restartWinBtn" : "restartFailBtn");
+        if (restartBtn) restartBtn.addEventListener("click", restartExam);
+        // стираем степпер (вкладки не активны)
+        if (stepIndicatorDiv) stepIndicatorDiv.innerHTML = `<div style="padding:0.6rem; text-align:center; color:cyan;">ЭКЗАМЕН ЗАВЕРШЁН</div>`;
+    }
+
+    // ========== ЛЕТАЮЩИЕ НОТКИ ==========
+    function createFloatingNotes() {
+        const noteSymbols = ['♪', '♫', '🎵', '🎶', '♩', '🎤'];
+        for (let i = 0; i < 38; i++) {
+            const note = document.createElement('div');
+            note.classList.add('floating-note');
+            note.textContent = noteSymbols[Math.floor(Math.random() * noteSymbols.length)];
+            const size = Math.floor(Math.random() * 25) + 16;
+            note.style.fontSize = size + 'px';
+            note.style.left = Math.random() * 100 + '%';
+            note.style.animationDuration = Math.random() * 10 + 5 + 's';
+            note.style.animationDelay = Math.random() * 20 + 's';
+            note.style.opacity = Math.random() * 0.6 + 0.2;
+            note.style.color = `hsl(${Math.random() * 40 + 170}, 100%, 65%)`;
+            document.body.appendChild(note);
+        }
+    }
+
+    function startBackgroundNotes() {
+        setInterval(() => {
+            if (document.body) {
+                const extraNote = document.createElement('div');
+                extraNote.classList.add('floating-note');
+                extraNote.textContent = ['♪', '♫', '🎵'][Math.floor(Math.random() * 3)];
+                extraNote.style.fontSize = (Math.random() * 20 + 14) + 'px';
+                extraNote.style.left = Math.random() * 100 + '%';
+                extraNote.style.animationDuration = Math.random() * 7 + 4 + 's';
+                extraNote.style.opacity = 0.5;
+                document.body.appendChild(extraNote);
+                setTimeout(() => extraNote.remove(), 8000);
+            }
+        }, 3000);
+    }
+
+    // ИНИЦИАЛИЗАЦИЯ
+    function init() {
+        createFloatingNotes();
+        startBackgroundNotes();
+        examStatus = "testing";
+        userAnswers = { q1: "", q2: "", q3: "" };
+        currentStepIndex = 0;
+        renderStepTabs();
+        renderCurrentStep();
+    }
+
+    init();
+</script>
+</body>
+</html>
